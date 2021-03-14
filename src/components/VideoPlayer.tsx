@@ -50,14 +50,14 @@ function VideoPlayer() {
 
   const [config, setConfig] = useState<Config | null>(null);
 
-  useKeylistener("KeyA", () => setPlay((p) => !p));
-  useKeylistener("ArrowDown", () => {
-    console.log("D");
+  useKeylistener({ mainKey: "ShiftLeft", extraKey: "Space" }, () => {
+    console.log("Shift Space");
     setCurrentIndex((c) => c + 1);
     setCurrentMarkerIndex(0);
   });
 
   useKeylistener("Space", (e) => {
+    console.log("Space");
     e.preventDefault();
     setPlay((p) => !p);
   });
