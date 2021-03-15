@@ -67,8 +67,9 @@ console.log("Found Modifier", modifier);
 				console.log("Hurray");
         return;
       }
-				else if(e.code === keymaps.mainKey && modifierKey{
-								modifier.eventHandler(e);
+				else if(e.code === keymaps.mainKey && modifierKey){
+				console.log("Modifier Event Handler");
+								modifierKey?.eventHandler(e);
 				}
 
     };
