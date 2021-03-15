@@ -53,16 +53,21 @@ export const useWithModifiersKeylistener = (keymaps: ModifierKeymap) => {
   const [modifierKey, setModifierKey] = useState<ModifierListener | null>(null);
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
-      if (e.code === keymaps.mainKey && !modifierKey) {
-        keymaps.mainEventHandler(e);
-        return;
-      }
-
+	
       const modifier = keymaps.modifierListeners.find(
         (m) => m.modifierKey === e.code
       );
 
-      setModifierKey(modifier ?? null);
+      
+console.log("Found Modifier", modifier);
+      setModifierKey(modifier ?? null);	
+			console.log("ModifierKey", modifierKey);
+      if (e.code === keymaps.mainKey && !modifierKey) {
+        keymaps.mainEventHandler(e);
+				console.log("Hurray");
+        return;
+      }
+
     };
 
     document.addEventListener("keyup", handler);

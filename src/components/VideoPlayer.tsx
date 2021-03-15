@@ -2,7 +2,9 @@ import React, { useRef, useState } from "react";
 import ReactPlayer from "react-player";
 import { FullScreen, useFullScreenHandle } from "react-full-screen";
 import { Button, Flex, IconButton } from "@chakra-ui/react";
-import useKeylistener from "../hooks/useKeylistener";
+import useKeylistener, {
+  useWithModifiersKeylistener,
+} from "../hooks/useKeylistener";
 import {
   FaCog,
   FaMinus,
@@ -50,10 +52,19 @@ function VideoPlayer() {
 
   const [config, setConfig] = useState<Config | null>(null);
 
-  useKeylistener({ mainKey: "ShiftLeft", extraKey: "Space" }, () => {
-    console.log("Shift Space");
-    setCurrentIndex((c) => c + 1);
-    setCurrentMarkerIndex(0);
+  useWithModifiersKeylistener({
+    mainKey: "Space",
+    mainEventHandler: () => {
+      console.log("Shift Space");
+      setCurrentIndex((c) => c + 1);
+      setCurrentMarkerIndex(0);
+    },
+    modifierListeners: [
+      {
+        modifierKey: "ShiftLeft",
+        eventHandler: () => "Oh Shiftleft",
+      },
+    ],
   });
 
   useKeylistener("Space", (e) => {
