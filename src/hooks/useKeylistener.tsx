@@ -73,5 +73,5 @@ console.log("Found Modifier", modifier);
     document.addEventListener("keyup", handler);
 
     return () => document.removeEventListener("keyup", handler);
-  }, [modifierKey]);
+  }, [modifierKey, keymaps]);
 };
