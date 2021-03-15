@@ -54,15 +54,19 @@ function VideoPlayer() {
 
   useWithModifiersKeylistener({
     mainKey: "Space",
-    mainEventHandler: () => {
-      console.log("Shift Space");
-      setCurrentIndex((c) => c + 1);
-      setCurrentMarkerIndex(0);
+    mainEventHandler: (e) => {
+      console.log("Space");
+      e.preventDefault();
+      setPlay((p) => !p);
     },
     modifierListeners: [
       {
         modifierKey: "ShiftLeft",
-        eventHandler: () => "Oh Shiftleft",
+        eventHandler: () => {
+          console.log("Damn Shift Space");
+          setCurrentIndex((c) => c + 1);
+          setCurrentMarkerIndex(0);
+        },
       },
     ],
   });
