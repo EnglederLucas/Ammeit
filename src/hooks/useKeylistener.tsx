@@ -62,11 +62,11 @@ export const useWithModifiersKeylistener = (keymaps: ModifierKeymap) => {
         (m) => m.modifierKey === e.code
       );
 
-      setModifierKey(modifier);
+      setModifierKey(modifier ?? null);
     };
 
     document.addEventListener("keyup", handler);
 
     return () => document.removeEventListener("keyup", handler);
-  }, [modifierKey, listeners]);
+  }, [modifierKey]);
 };
