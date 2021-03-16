@@ -8,7 +8,6 @@ function useKeylistener(
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
-      console.log("New Event: ", e.code, "key", key);
       if (typeof key === "string") {
         if (key === e.code) eventHandler(e);
 
@@ -53,25 +52,19 @@ export const useWithModifiersKeylistener = (keymaps: ModifierKeymap) => {
   const [modifierKey, setModifierKey] = useState<ModifierListener | null>(null);
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
-	
       const modifier = keymaps.modifierListeners.find(
         (m) => m.modifierKey === e.code
       );
 
-      
-console.log("Found Modifier", modifier);
-      setModifierKey(modifier ?? null);	
-			console.log("ModifierKey", modifierKey);
+      setModifierKey(modifier ?? null);
+
       if (e.code === keymaps.mainKey && !modifierKey) {
         keymaps.mainEventHandler(e);
-				console.log("Hurray");
+        console.log("Hurray");
         return;
+      } else if (e.code === keymaps.mainKey && modifierKey) {
+        modifierKey?.eventHandler(e);
       }
-				else if(e.code === keymaps.mainKey && modifierKey){
-				console.log("Modifier Event Handler");
-								modifierKey?.eventHandler(e);
-				}
-
     };
 
     document.addEventListener("keyup", handler);

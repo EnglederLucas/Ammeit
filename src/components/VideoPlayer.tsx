@@ -7,6 +7,7 @@ import useKeylistener, {
 } from "../hooks/useKeylistener";
 import {
   FaCog,
+  FaHandPaper,
   FaMinus,
   FaPause,
   FaPlay,
@@ -52,6 +53,9 @@ function VideoPlayer() {
 
   const [config, setConfig] = useState<Config | null>(null);
 
+  const getCurrentMarker = () =>
+    videos[currentIndex]?.config?.markers[currentMarkerIndex];
+
   useWithModifiersKeylistener({
     mainKey: "Space",
     mainEventHandler: (e) => {
@@ -71,11 +75,39 @@ function VideoPlayer() {
     ],
   });
 
-  useKeylistener("Space", (e) => {
-    console.log("Space");
-    e.preventDefault();
-    setPlay((p) => !p);
-  });
+  // useWithModifiersKeylistener({
+  //   mainKey: "ArrowRight",
+  //   mainEventHandler: () => {
+  //     if (
+  //       play &&
+  //       currentMarkerIndex >=
+  //         (videos[currentIndex]?.config?.markers?.length ?? -1)
+  //     ) {
+  //       setCurrentIndex((c) => c + 1);
+  //       setCurrentMarkerIndex(0);
+  //     } else if (play) {
+  //       console.log("When Playing", getCurrentMarker());
+  //       if (getCurrentMarker() !== undefined) {
+  //         player?.current?.seekTo(getCurrentMarker() as number, "seconds");
+  //         setTimeout(() => {
+  //           setPlay(true);
+  //           console.log("PLAY");
+  //         }, 120);
+  //       }
+  //     } else if (!play) {
+  //       setPlay(true);
+  //     }
+  //   },
+  //   modifierListeners: [
+  //     {
+  //       modifierKey: "Ctrl",
+  //       eventHandler: () => {
+  //         setCurrentIndex((c) => c + 1);
+  //         setCurrentMarkerIndex(0);
+  //       },
+  //     },
+  //   ],
+  // });
 
   useKeylistener("ArrowLeft", () => {
     if (currentMarkerIndex === 0) {
@@ -97,6 +129,12 @@ function VideoPlayer() {
       // setPlay(true);
     }
   });
+
+  useKeylistener("ArrowDown", () => {
+    setCurrentIndex((c) => c + 1);
+    setCurrentMarkerIndex(0);
+  });
+
   useKeylistener("ArrowRight", () => {
     if (
       play &&
@@ -105,7 +143,18 @@ function VideoPlayer() {
     ) {
       setCurrentIndex((c) => c + 1);
       setCurrentMarkerIndex(0);
-    } else setPlay(true);
+    } else if (play) {
+      console.log("When Playing", getCurrentMarker());
+      if (getCurrentMarker() !== undefined) {
+        player?.current?.seekTo(getCurrentMarker() as number, "seconds");
+        setTimeout(() => {
+          setPlay(true);
+          console.log("PLAY");
+        }, 120);
+      }
+    } else if (!play) {
+      setPlay(true);
+    }
   });
 
   const controlByMarkers = (seconds: number) => {
@@ -221,7 +270,7 @@ function VideoPlayer() {
           ml={2}
           variant="ghost"
           color="current"
-          icon={<FaRegHandPaper />}
+          icon={videoControls ? <FaHandPaper /> : <FaRegHandPaper />}
           aria-label="Toggle Video Controls"
           onClick={() => setVideoControls((v) => !v)}
           size="md"
