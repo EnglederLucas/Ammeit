@@ -109,7 +109,7 @@ function VideoPlayer() {
   //   ],
   // });
 
-  useKeylistener("ArrowLeft", () => {
+  const back = () => {
     if (currentMarkerIndex === 0) {
       setCurrentIndex((c) => c - 1);
       setCurrentMarkerIndex(0);
@@ -128,18 +128,22 @@ function VideoPlayer() {
 
       // setPlay(true);
     }
-  });
+  };
 
-  useKeylistener("ArrowDown", () => {
+  useKeylistener("ArrowLeft", back);
+  useKeylistener("ArrowDown", back);
+
+  useKeylistener("Enter", () => {
     setCurrentIndex((c) => c + 1);
     setCurrentMarkerIndex(0);
   });
 
-  useKeylistener("ArrowRight", () => {
+  const next = () => {
     if (
       play &&
-      currentMarkerIndex >=
-        (videos[currentIndex]?.config?.markers?.length ?? -1)
+      (currentMarkerIndex >=
+        (videos[currentIndex]?.config?.markers?.length ?? -1) ||
+        getCurrentMarker() === 1000)
     ) {
       setCurrentIndex((c) => c + 1);
       setCurrentMarkerIndex(0);
@@ -155,7 +159,10 @@ function VideoPlayer() {
     } else if (!play) {
       setPlay(true);
     }
-  });
+  };
+
+  useKeylistener("ArrowRight", next);
+  useKeylistener("ArrowUp", next);
 
   const controlByMarkers = (seconds: number) => {
     // if (!play) return;
@@ -168,6 +175,8 @@ function VideoPlayer() {
       "Paused at Position",
       seconds,
       markerIndex,
+      "Markers",
+      videos[currentIndex]?.config?.markers,
       videos[currentIndex]?.config?.markers[currentMarkerIndex],
       Math.floor(seconds * 10) / 10
     );
@@ -193,7 +202,9 @@ function VideoPlayer() {
     console.debug("Videos", videos);
 
     setCurrentIndex(0);
+
     setVideos(videos);
+    if (config) resetConfig(config);
   };
 
   const readConfig = async (config: File | null): Promise<void> => {
@@ -210,12 +221,23 @@ function VideoPlayer() {
       return;
     }
 
+    resetConfig(content);
+
+    console.log(content);
+    console.log("Videos", videos);
+  };
+
+  const resetConfig = (config: Config) => {
+    if (!config) {
+      return;
+    }
+
     setVideos((videos): Video[] =>
       videos.map(
         (v): Video => ({
           config: {
             markers:
-              content?.find((c) => c.fileName === v.fileName)?.markers ?? [],
+              config?.find((c) => c.fileName === v.fileName)?.markers ?? [],
           },
           ...v,
         })
@@ -224,10 +246,7 @@ function VideoPlayer() {
 
     setCurrentMarkerIndex(0);
     setCurrentIndex(0);
-    setConfig(content);
-
-    console.log(content);
-    console.log("Videos", videos);
+    setConfig(config);
   };
 
   function changeDurationOfVideo(duration: number) {
@@ -247,20 +266,22 @@ function VideoPlayer() {
       mt="10"
     >
       <FullScreen handle={handle}>
-        <ReactPlayer
-          ref={player}
-          progressInterval={60}
-          height={handle.active ? "100vh" : "100%"}
-          width={handle.active ? "100vw" : "100%"}
-          controls={videoControls}
-          style={{ backgroundColor: "#1A263A" }}
-          playing={play}
-          onDuration={(d) => changeDurationOfVideo(d)}
-          onProgress={(s) =>
-            controlByMarkers(s.played * (videos[currentIndex]?.duration ?? 0))
-          }
-          url={videos[currentIndex]?.url}
-        ></ReactPlayer>
+        {videos.length > 0 && config && (
+          <ReactPlayer
+            ref={player}
+            progressInterval={60}
+            height={handle.active ? "100vh" : "100%"}
+            width={handle.active ? "100vw" : "100%"}
+            controls={videoControls}
+            style={{ backgroundColor: "#1A263A" }}
+            playing={play}
+            onDuration={(d) => changeDurationOfVideo(d)}
+            onProgress={(s) =>
+              controlByMarkers(s.played * (videos[currentIndex]?.duration ?? 0))
+            }
+            url={videos[currentIndex]?.url}
+          ></ReactPlayer>
+        )}
       </FullScreen>
 
       <Flex mt="10">
@@ -313,6 +334,7 @@ function VideoPlayer() {
           <FileInputButton
             onChangeFiles={(f) => readConfig(f ? f.item(0) : null)}
             ml="2"
+            colorScheme="green"
             leftIcon={<FaCog />}
             justifySelf="flex-end"
             size="md"
