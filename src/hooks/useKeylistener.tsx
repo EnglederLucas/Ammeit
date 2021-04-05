@@ -1,39 +1,39 @@
 import { useEffect, useState } from "react";
 
 function useKeylistener(
-  key: { mainKey: string; extraKey?: string } | string,
-  eventHandler: (e: KeyboardEvent) => void
+	key: { mainKey: string; extraKey?: string } | string,
+	eventHandler: (e: KeyboardEvent) => void
 ): void {
-  const [firstKeyPressed, setFirstKeyPressed] = useState(false);
+	const [firstKeyPressed, setFirstKeyPressed] = useState(false);
 
-  useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
-      if (typeof key === "string") {
-        if (key === e.code) eventHandler(e);
+	useEffect(() => {
+		const handler = (e: KeyboardEvent) => {
+			if (typeof key === "string") {
+				if (key === e.code) eventHandler(e);
 
-        return;
-      }
+				return;
+			}
 
-      if (e.code === key.mainKey && !key.extraKey) {
-        eventHandler(e);
-        return;
-      }
+			if (e.code === key.mainKey && !key.extraKey) {
+				eventHandler(e);
+				return;
+			}
 
-      if (e.code === key.extraKey && firstKeyPressed) {
-        e.preventDefault();
-        eventHandler(e);
+			if (e.code === key.extraKey && firstKeyPressed) {
+				e.preventDefault();
+				eventHandler(e);
 
-        setFirstKeyPressed(false);
-      } else if (e.code === key.mainKey) {
-        setFirstKeyPressed(true);
-      } else {
-        setFirstKeyPressed(false);
-      }
-    };
+				setFirstKeyPressed(false);
+			} else if (e.code === key.mainKey) {
+				setFirstKeyPressed(true);
+			} else {
+				setFirstKeyPressed(false);
+			}
+		};
 
-    document.addEventListener("keyup", handler);
-    return () => document.removeEventListener("keyup", handler);
-  }, [key, eventHandler, firstKeyPressed]);
+		document.addEventListener("keyup", handler);
+		return () => document.removeEventListener("keyup", handler);
+	}, [key, eventHandler, firstKeyPressed]);
 }
 export default useKeylistener;
 
@@ -49,26 +49,26 @@ type ModifierKeymap = {
 };
 
 export const useWithModifiersKeylistener = (keymaps: ModifierKeymap) => {
-  const [modifierKey, setModifierKey] = useState<ModifierListener | null>(null);
-  useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
-      const modifier = keymaps.modifierListeners.find(
-        (m) => m.modifierKey === e.code
-      );
+	const [modifierKey, setModifierKey] = useState<ModifierListener | null>(null);
+	useEffect(() => {
+		const handler = (e: KeyboardEvent) => {
+			const modifier = keymaps.modifierListeners.find(
+				(m) => m.modifierKey === e.code
+			);
 
-      setModifierKey(modifier ?? null);
+			setModifierKey(modifier ?? null);
 
-      if (e.code === keymaps.mainKey && !modifierKey) {
-        keymaps.mainEventHandler(e);
-        console.log("Hurray");
-        return;
-      } else if (e.code === keymaps.mainKey && modifierKey) {
-        modifierKey?.eventHandler(e);
-      }
-    };
+			if (e.code === keymaps.mainKey && !modifierKey) {
+				keymaps.mainEventHandler(e);
+				console.log("Hurray");
+				return;
+			} else if (e.code === keymaps.mainKey && modifierKey) {
+				modifierKey?.eventHandler(e);
+			}
+		};
 
-    document.addEventListener("keyup", handler);
+		document.addEventListener("keyup", handler);
 
-    return () => document.removeEventListener("keyup", handler);
-  }, [modifierKey, keymaps]);
+		return () => document.removeEventListener("keyup", handler);
+	}, [modifierKey, keymaps]);
 };
